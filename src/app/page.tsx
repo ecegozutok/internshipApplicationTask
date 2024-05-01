@@ -1,95 +1,84 @@
-import Image from "next/image";
+"use client";
 import styles from "./page.module.css";
+import Stack from "./Stack.js";
+import { useState } from "react";
 
 export default function Home() {
+
+  let initialTransparency = [true, true, true, true, true, true, true, true, true]
+
+  const [isTransparent, setTransparent] = useState(initialTransparency)
+  const [stack, setStack] = useState(new Stack())
+  
+  let temp : [index : number, transparency: boolean]
+
+  const onBackButtonClick = () => {
+    if(stack.isEmpty()){
+      window.alert("Geri alınacak bir hamle yok.");
+    }
+    else{
+      temp = stack.pop();
+      const nextTransparency = isTransparent.map((c, i) => {
+        if (i === temp[0]) {
+          // Change the value of the clicked square's transparency
+          return temp[1]
+        
+        } else {
+          // The rest haven't changed
+          return c;
+        }
+      });
+      setTransparent(nextTransparency);
+    }
+  };
+
+  function onSquareClick(index) {    
+    
+    const nextTransparency = isTransparent.map((c, i) => {
+      if (i === index) {
+        // Change the value of the clicked square's transparency
+        if (c == true){
+          stack.push([i, true]);
+          return false;
+        }
+          
+        else{
+          stack.push([i, false])
+          return true;
+        }
+      } else {
+        // The rest haven't changed
+        return c;
+      }
+    });
+    setTransparent(nextTransparency);
+    
+  }
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+      
+      <button className={styles.backButton} onClick={onBackButtonClick}>
+        GERİ AL
+      </button>
+
+      <div className={styles.squareContainer}>
+
+        <ul>
+          {isTransparent.map((counter, i) => (
+          <li key={i}>
+            {counter}
+            <button className={ isTransparent[i] ? styles.transparent : styles.square }onClick={() => {
+              onSquareClick(i);
+            }}>X</button>
+          </li>
+          ))}
+        </ul>
+        
+        
       </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+    
     </main>
   );
 }
